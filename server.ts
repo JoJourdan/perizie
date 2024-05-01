@@ -1,4 +1,4 @@
-import _https from "https";
+import _http from "http";
 import _url from "url";
 import _fs from "fs";
 import _express from "express";
@@ -38,11 +38,11 @@ const PRIVATE_KEY = _fs.readFileSync("./keys/privateKey.pem", "utf8");
 const CERTIFICATE = _fs.readFileSync("./keys/certificate.crt", "utf8");
 const ENCRYPTION_KEY = _fs.readFileSync("./keys/encryptionKey.txt", "utf8");
 const CREDENTIALS = { "key": PRIVATE_KEY, "cert": CERTIFICATE };
-const https_server = _https.createServer(CREDENTIALS, app);
+const server = _http.createServer( app);
 // Il secondo parametro facoltativo ipAddress consente di mettere il server in ascolto su una delle interfacce della macchina, se non lo metto viene messo in ascolto su tutte le interfacce (3 --> loopback e 2 di rete)
-https_server.listen(3000, () => {
+server.listen(3000, () => {
     init();
-    console.log(`Server HTTPS in ascolto sulla porta ${HTTPS_PORT}`);
+    console.log(`Il Server è in ascolto sulla porta ${3000}`);
 });
 
 function init() {
