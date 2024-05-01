@@ -1,0 +1,9 @@
+[
+{
+    "codOperatore":"1",
+    "dateTime":"",
+    "coordinate":{"y":0,"x":0},
+    "descrizione":"perizia 1",
+    "fotografie":[{"foto":"url","commento":"foto 1"},{"foto":"url","commento":"foto 2"}]
+}
+]
