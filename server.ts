@@ -314,12 +314,13 @@ app.get("/api/getFotoUtente", async (req, res, next) => {
 app.post("/api/cambiaPassword", async (req, res, next) => {
     let pwd=req["body"].pwd
     let id=req["body"]._id
+    let _id=new ObjectId(id)
     const client = new MongoClient(connectionString);
     await client.connect();
-    const collection = client.db(DBNAME).collection("perizie");
+    const collection = client.db(DBNAME).collection("utente");
     console.log(pwd,id)
     _bcrypt.hash(pwd, 10, function(err, hash) {
-        let rq = collection.updateOne({"_id": id},{$set:{"password":hash}});
+        let rq = collection.updateOne({"_id": _id},{$set:{"password":hash}});
     rq.then((data) => res.send(data));
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
     rq.finally(() => client.close()); })
