@@ -231,9 +231,6 @@ app.get("/api/elencoUtenti", async (req, res, next) => {
     const client = new MongoClient(connectionString);
     await client.connect();
     const collection = client.db(DBNAME).collection("utente");
-    _bcrypt.hash("password", 10, function(err, hash) {
-        console.log(hash) })
-       
     let rq = collection.find().toArray();
     rq.then((data) => res.send(data));
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
@@ -312,6 +309,22 @@ app.get("/api/getFotoUtente", async (req, res, next) => {
     rq.then((data) => res.send(data));
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
     rq.finally(() => client.close());
+});
+
+app.post("/api/cambiaPassword", async (req, res, next) => {
+    let pwd=req["body"].pwd
+    let id=req["body"]._id
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    const collection = client.db(DBNAME).collection("perizie");
+
+    _bcrypt.hash(pwd, 10, function(err, hash) {
+        let rq = collection.updateOne({"_id": id},{$set:{"password":hash}});
+    rq.then((data) => res.send(data));
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
+    rq.finally(() => client.close()); })
+       
+    
 });
 //********************************************************************************************//
 // Default route e gestione degli errori
