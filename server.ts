@@ -317,7 +317,7 @@ app.post("/api/cambiaPassword", async (req, res, next) => {
     const client = new MongoClient(connectionString);
     await client.connect();
     const collection = client.db(DBNAME).collection("perizie");
-
+    console.log(pwd,id)
     _bcrypt.hash(pwd, 10, function(err, hash) {
         let rq = collection.updateOne({"_id": id},{$set:{"password":hash}});
     rq.then((data) => res.send(data));
