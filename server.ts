@@ -328,15 +328,29 @@ app.post("/api/cambiaPassword", async (req, res, next) => {
     
 });
 
-app.get("/api/getFotoUtente", async (req, res, next) => {
+app.get("/api/getPerizia", async (req, res, next) => {
     let img=req["query"].img
     const client = new MongoClient(connectionString);
     await client.connect();
     const collection = client.db(DBNAME).collection("perizie");
-    let rq = collection.findOne({"fotografie":{"img": img}});
+    let rq = collection.findOne({"fotografie.img": img});
     rq.then((data) => res.send(data));
     rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
     rq.finally(() => client.close());
+});
+
+app.post("/api/eliminaPerizia", async (req, res, next) => {
+    let id=req["body"]._id
+    let _id=new ObjectId(id)
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    const collection = client.db(DBNAME).collection("utente");
+    let rq = collection.deleteOne({"_id": _id});
+    rq.then((data) => res.send(data));
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
+    rq.finally(() => client.close()); 
+       
+    
 });
 
 //********************************************************************************************//
