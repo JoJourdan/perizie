@@ -17,12 +17,56 @@ $(document).ready(function () {
             _tbody.empty()
             for (let utente of response.data) {
                 let _tr = $("<tr>").appendTo(_tbody)
-                $("<td>").appendTo(_tr).text(utente._id)
+                $("<td>").appendTo(_tr).html(`<a href="perizie.html?utente='${utente._id}'">${utente._id}</a>`)
                 $("<td>").appendTo(_tr).text(utente.username)
+                $("<button>").html("<i class='bi bi-trash-fill'></i>").appendTo($("<td>").appendTo(_tr).css("text-align","center")).css("width","50px").on("click",()=>{deleteUtente(utente)})
 
             }
         })
         rq.catch(errore)
+    }
+
+    function deleteUtente(utente){
+        if(utente.username!="admin")
+        Swal.fire({
+            title: "Sicuro di voler eliminare l'utente?",
+            inputAttributes: {
+                autocapitalize: "on",
+                
+            },
+            showCancelButton: true,
+            confirmButtonText: "Conferma",
+            showLoaderOnConfirm: true,
+            preConfirm: async (username) => {
+                try {
+
+                    return username;
+                } catch (error) {
+                    Swal.showValidationMessage(`
+                  Request failed: ${error}
+                `);
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let rq = inviaRichiesta('DELETE', '/api/eliminaUtente',{"id":utente._id});
+                rq.then(function (response) {
+                    let rq1 = inviaRichiesta('DELETE', '/api/eliminaPeriziaByCoOp',{"id":utente._id});
+                    rq.then(function (response){
+                        Swal.fire({
+                            icon: "success",
+                            title: "Utente eliminato con successo",
+                            showConfirmButton: false,
+                            timer: 1500
+                          });
+                        getUtenti()
+                    })
+                    rq1.catch(errore)
+                })
+                rq.catch(errore)
+            }
+        });
     }
 
     _cercaUtente.on("click", () => {

@@ -1,6 +1,8 @@
 "use strict";
 
 const _URL = ""
+const URL_MAPS = "https://maps.googleapis.com/maps/api"
+const MAP_KEY = "AIzaSyBZKYgxbiyRE7DknUpnRP2QHCBVjvLgH7g";
 // Se vuota viene assegnata in automatico l'origine da cui è stata scaricata la pagina
 
 // Configurazione degli interceptors di axios
@@ -59,4 +61,21 @@ function errore(err) {
 		alert("Server Error: " + err.response.status + " - " + err.response.data);
 	}
 }
+
+function caricaGoogleMaps(){
+	let promise =  new Promise(function(resolve, reject){
+		var script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.src = URL_MAPS + '/js?v=3&key=' + MAP_KEY;
+		document.body.appendChild(script);
+		// onload e onerror sono semplici puntatori a funzione
+		// in cui memorizzare i puntatori alle funzione da eseguire
+		script.onload = resolve;  // non inietta alcun dato
+		script.onerror = function (){
+			reject("Errore caricamento Google Maps");
+		} 
+	})
+	return promise
+}
+
 

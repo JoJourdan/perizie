@@ -290,6 +290,7 @@ app.post("/api/saveImage", (req, res, next) => {
 
 app.post("/api/salvaPeripezia", async (req, res, next) => {
     let newRecord = req["body"];
+    delete newRecord["_id"];
     const client = new MongoClient(connectionString);
     await client.connect();
     let collection = client.db(DBNAME).collection("perizie");
@@ -339,8 +340,47 @@ app.get("/api/getPerizia", async (req, res, next) => {
     rq.finally(() => client.close());
 });
 
-app.post("/api/eliminaPerizia", async (req, res, next) => {
-    let id=req["body"]._id
+app.delete("/api/eliminaPerizia", async (req, res, next) => {
+    let id=req["body"].id
+    let _id=new ObjectId(id)
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    const collection = client.db(DBNAME).collection("perizie");
+    let rq = collection.deleteOne({"_id": _id});
+    rq.then((data) => res.send(data));
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
+    rq.finally(() => client.close()); 
+       
+    
+});
+
+app.patch("/api/modificaPerizia", async (req, res, next) => {
+    let perizia=req["body"].perizia
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    const collection = client.db(DBNAME).collection("perizie");
+    let _id=new ObjectId(perizia._id)
+    let rq = collection.updateOne({"_id": _id},{"$set":{"descrizione":perizia.descrizione,"fotografie":perizia.fotografie}});
+    rq.then((data) => res.send(data));
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
+    rq.finally(() => client.close()); 
+       
+    
+});
+
+app.patch("/api/eliminaFoto", async (req, res, next) => {
+    let img=req["body"].img
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    const collection = client.db(DBNAME).collection("perizie");
+    let rq = collection.updateOne({"fotografie": img},{"$pull":{"fotografie":img}});
+    rq.then((data) => res.send(data));
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
+    rq.finally(() => client.close());
+});
+
+app.delete("/api/eliminaUtente", async (req, res, next) => {
+    let id=req["body"].id
     let _id=new ObjectId(id)
     const client = new MongoClient(connectionString);
     await client.connect();
@@ -351,6 +391,30 @@ app.post("/api/eliminaPerizia", async (req, res, next) => {
     rq.finally(() => client.close()); 
        
     
+});
+
+app.delete("/api/eliminaPeriziaByCoOp", async (req, res, next) => {
+    let id=req["body"].id
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    const collection = client.db(DBNAME).collection("perizie");
+    let rq = collection.deleteOne({"codiceOperatore": id});
+    rq.then((data) => res.send(data));
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
+    rq.finally(() => client.close()); 
+       
+    
+});
+
+app.get("/api/getPerizieUtente", async (req, res, next) => {
+    let utente=req["query"]._id
+    const client = new MongoClient(connectionString);
+    await client.connect();
+    const collection = client.db(DBNAME).collection("perizie");
+    let rq = collection.find({"codiceOperatore": utente}).toArray();
+    rq.then((data) => res.send(data));
+    rq.catch((err) => res.status(500).send(`Errore esecuzione query: ${err.message}`));
+    rq.finally(() => client.close());
 });
 
 //********************************************************************************************//
